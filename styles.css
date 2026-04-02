@@ -1,35 +1,271 @@
+/* ============================================================================
+   LabMind 前端样式表
+   主题：浅色模式
+   布局：三列布局 + 两个弹窗（右侧结果面板 + 底部历史抽屉）
+   ============================================================================ */
+
+/* ============================================================================
+   1. CSS 变量（主题颜色）
+   ============================================================================ */
 :root{
-  --bg:#0f1720; --card:#0b1220; --muted:#9aa4b2; --accent:#2dd4bf; --danger:#ef4444; --glass: rgba(255,255,255,0.03);
+  --bg: #f5f7fb;           /* 背景色 */
+  --card: #ffffff;          /* 卡片背景 */
+  --muted: #6c757d;         /* 次要文字 */
+  --accent: #0d6efd;        /* 主色调（蓝色） */
+  --danger: #ef4444;        /* 危险色（红色） */
+  --glass: rgba(0,0,0,0.02);/* 玻璃效果 */
 }
-*{box-sizing:border-box}
-body{font-family:Inter,Segoe UI,Arial,sans-serif;margin:0;color:#e6eef6;background:linear-gradient(180deg,#071024 0%, #081026 100%);}
-header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.03)}
-header h1{margin:0;font-size:20px}
-header .sub{margin:4px 0 0;color:var(--muted)}
-.layout{display:grid;grid-template-columns:320px 1fr 320px;gap:16px;padding:20px}
-.card{background:var(--card);padding:14px;border-radius:8px;box-shadow:0 6px 18px rgba(2,6,23,0.6);color:#dbeafe}
-.left .card h2,.center .card h2,.right .card h2{margin:0 0 8px}
-textarea{width:100%;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.05);background:var(--glass);color:#e6eef6}
-button{background:var(--accent);border:none;padding:8px 12px;border-radius:6px;color:#022;cursor:pointer}
-button.danger{background:var(--danger);color:#fff}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-label{display:block;font-size:13px;color:var(--muted)}
-input,select{width:100%;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef6}
-#historyList{max-height:140px;overflow:auto;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px}
-#log{height:360px;overflow:auto;background:#03101a;padding:8px;border-radius:6px;color:#9fd8d0;font-family:monospace;font-size:13px}
-#paramDiff{background:#031018;padding:10px;border-radius:6px;color:#bfeef0;height:140px;overflow:auto}
-footer{padding:12px 20px;color:var(--muted);font-size:13px;border-top:1px solid rgba(255,255,255,0.02)}
+
+/* ============================================================================
+   2. 全局样式
+   ============================================================================ */
+*{box-sizing:border-box}  /* 所有元素使用 border-box 盒模型 */
+
+body{
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  margin:0;
+  color:#212529;
+  background:linear-gradient(180deg,#f8f9fc 0%, #eef2f6 100%);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;  /* 确保 footer 紧贴底部 */
+}
+
+/* ============================================================================
+   3. 头部样式
+   ============================================================================ */
+header{
+  padding:20px 24px;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  background:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-left{flex:1}  /* 左侧标题区域 */
+
+.header-right{
+  display:flex;
+  gap:12px;  /* 按钮间距 */
+  align-items:center;
+}
+
+header h1{
+  margin:0;
+  font-size:20px;
+  color:#212529;
+}
+
+header .sub{
+  margin:4px 0 0;
+  color:var(--muted);  /* 副标题灰色 */
+}
+
+/* ============================================================================
+   4. 三列布局
+   ============================================================================ */
+.layout{
+  display:grid;
+  grid-template-columns:360px 1fr 320px;  /* 左：中：右 = 360px : 自适应 : 320px */
+  gap:16px;
+  padding:20px;
+  flex-grow:1;  /* 填充剩余空间 */
+}
+
+/* 左侧栏：参数对比 + 执行日志 */
+.left{
+  display:flex;
+  flex-direction:column;
+  gap:16px;  /* 卡片间距 */
+  min-height:0;  /* 允许 flex 子项正确收缩 */
+}
+
+.left .card{
+  flex:1;  /* 均分高度 */
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.left .card h2{
+  flex-shrink:0;  /* 标题不收缩 */
+  margin:0 0 8px;
+  color:#212529;
+}
+
+.left #log,
+.left #paramDiff{
+  flex:1;  /* 内容区域填充剩余空间 */
+  min-height:0;
+}
+
+/* ============================================================================
+   5. 卡片通用样式
+   ============================================================================ */
+.card{
+  background:var(--card);
+  padding:14px;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+  color:#212529;
+}
+
+.center .card h2,
+.right .card h2{
+  margin:0 0 8px;
+  color:#212529;
+}
+
+/* 中间栏：实验指令（居中显示） */
+.center{
+  display:flex;
+  align-items:center;  /* 垂直居中 */
+  justify-content:center;  /* 水平居中 */
+}
+
+.center .card{
+  width:100%;
+  max-width:500px;
+}
+
+/* 扩大版实验指令卡片 */
+.center .expanded-card{
+  width:100%;
+  max-width:700px;  /* 从 500px 扩大到 700px */
+  min-height:280px;
+  padding:20px;
+}
+
+.expanded-card textarea{
+  min-height:160px;
+}
+
+/* ============================================================================
+   6. 表单元素样式
+   ============================================================================ */
+textarea{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ced4da;
+  background:#fff;
+  color:#212529;
+  min-height:120px;
+  resize:vertical;  /* 允许垂直调整大小 */
+}
+
+button{
+  background:var(--accent);
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+}
+
+button.danger{
+  background:var(--danger);  /* 红色危险按钮 */
+  color:#fff;
+}
+
+/* 参数面板网格布局 */
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;  /* 两列 */
+  gap:8px;
+}
+
+/* 参数面板中的 label：使用 flex 确保输入框底部对齐 */
+.form-grid label{
+  display:flex;
+  flex-direction:column;
+  min-height:48px;  /* 固定最小高度，避免换行导致高度不一致 */
+}
+
+label{
+  display:block;
+  font-size:13px;
+  color:#000;  /* 纯黑色文字 */
+}
+
+input,select{
+  width:100%;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #000;  /* 纯黑色边框 */
+  background:#fff;
+  color:#000;
+  margin-top:auto;  /* 推到底部，确保对齐 */
+}
+
+/* 参数面板提示文字（灰色） */
+.panel-hint{
+  color:#6c757d;
+}
+
+/* ============================================================================
+   7. 特定区域样式
+   ============================================================================ */
+#historyList{
+  flex:1;
+  overflow-y:auto;
+  padding:8px;
+  background:#f8f9fa;
+  border-radius:6px;
+}
+
+#log{
+  background:#f1f3f5;
+  padding:8px;
+  border-radius:6px;
+  color:#212529;
+  font-family:monospace;
+  font-size:13px;
+  overflow-y:auto;
+  min-height:200px;
+}
+
+#paramDiff{
+  background:#f1f3f5;
+  padding:10px;
+  border-radius:6px;
+  color:#212529;
+  overflow-y:auto;
+  min-height:100px;
+}
+
+/* Footer 紧贴底部 */
+footer{
+  padding:12px 20px;
+  color:var(--muted);
+  font-size:13px;
+  border-top:1px solid rgba(0,0,0,0.08);
+  background:#fff;
+  margin-top:auto;
+}
+
+/* 右侧栏卡片高度自适应 */
+.right .card{
+  height:fit-content;
+}
+
+/* ============================================================================
+   8. 结果展示样式
+   ============================================================================ */
 .results-container {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     align-items: flex-start;
 }
+
 .results-image {
     flex: 1;
     min-width: 200px;
     max-width: 400px;
 }
+
 .results-image img {
     width: 100%;
     height: auto;
@@ -37,30 +273,193 @@ footer{padding:12px 20px;color:var(--muted);font-size:13px;border-top:1px solid 
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     background: #fff;
 }
+
 .results-table {
     flex: 2;
     min-width: 260px;
     border-collapse: collapse;
-    background: rgba(255,255,255,0.05);
+    background: #fff;
     border-radius: 12px;
     overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.1);
 }
+
 .results-table th,
 .results-table td {
     padding: 10px 12px;
     text-align: left;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+
 .results-table th {
     background: var(--accent);
-    color: #022;
+    color: #fff;
     font-weight: 600;
 }
+
 .results-table tr:last-child td {
     border-bottom: none;
 }
+
 .results-table td:first-child {
     font-weight: 500;
     color: var(--accent);
 }
-@media(max-width:1000px){.layout{grid-template-columns:1fr;}}
+
+/* ============================================================================
+   9. 弹窗样式 - 结果面板（右侧滑出）
+   ============================================================================ */
+.overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.3s,visibility 0.3s;
+  z-index:998;
+}
+
+.overlay.show{
+  opacity:1;
+  visibility:visible;
+}
+
+.results-panel{
+  position:fixed;
+  top:0;
+  right:0;
+  width:400px;
+  height:100vh;
+  background:#fff;
+  box-shadow:-4px 0 16px rgba(0,0,0,0.15);
+  transform:translateX(100%);  /* 初始隐藏在右侧 */
+  transition:transform 0.3s ease;
+  z-index:999;
+  display:flex;
+  flex-direction:column;
+}
+
+.results-panel.open{
+  transform:translateX(0);  /* 滑入显示 */
+}
+
+.panel-header{
+  padding:20px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+}
+
+.panel-header h2{
+  margin:0;
+  font-size:18px;
+  color:#212529;
+}
+
+.close-btn{
+  background:transparent;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  color:#6c757d;
+  padding:0;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+}
+
+.close-btn:hover{
+  background:rgba(0,0,0,0.05);
+}
+
+.panel-content{
+  flex-grow:1;
+  overflow-y:auto;
+  padding:20px;
+  background:#f8f9fa;
+}
+
+/* ============================================================================
+   10. 弹窗样式 - 历史抽屉（底部滑出）
+   ============================================================================ */
+.history-drawer{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:60vh;  /* 占屏幕 60% 高度 */
+  background:#fff;
+  box-shadow:0 -4px 16px rgba(0,0,0,0.15);
+  transform:translateY(100%);  /* 初始隐藏在底部 */
+  transition:transform 0.3s ease;
+  z-index:999;
+  display:flex;
+  flex-direction:column;
+  border-radius:12px 12px 0 0;
+}
+
+.history-drawer.open{
+  transform:translateY(0);  /* 滑入显示 */
+}
+
+.drawer-header{
+  padding:20px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+  border-radius:12px 12px 0 0;
+}
+
+.drawer-header h2{
+  margin:0;
+  font-size:18px;
+  color:#212529;
+}
+
+.drawer-sub{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.drawer-content{
+  flex-grow:1;
+  overflow-y:auto;
+  padding:20px;
+  background:#f8f9fa;
+}
+
+#historyList{
+  background:#fff;
+  padding:12px;
+  border-radius:6px;
+  min-height:200px;
+}
+
+.histItem{
+  padding:12px;
+  border-bottom:1px solid rgba(0,0,0,0.05);
+}
+
+.histItem:last-child{
+  border-bottom:none;
+}
+
+/* ============================================================================
+   11. 响应式布局
+   ============================================================================ */
+@media(max-width:1000px){
+  .layout{
+    grid-template-columns:1fr;  /* 移动端单列显示 */
+  }
+}
